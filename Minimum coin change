@@ -1,0 +1,59 @@
+#include<bits/stdc++.h>
+#define ll long long
+#define N '\n'
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+using namespace std;
+ 
+ll dp[1000000];
+ll ara[10000];
+ll n;
+ 
+ll f(ll x)
+{
+    if(x == 0)
+    {
+        return 0;
+    }
+    if(dp[x] != 0)
+    {
+        return dp[x];
+    }
+    ll mini = 1000000000000,i,j;
+    for(i = 0;i < n;i++)
+    {
+        if((x-ara[i]) >= 0)
+        {
+            mini = min(mini,f(x-ara[i]));
+        }
+    }
+    dp[x] = mini+1;
+    return dp[x];
+}
+ 
+int main()
+{
+    fastIO();
+    ll t,it;
+    t = 1;
+    for(it = 1;it <= t;it++)
+    {
+        ll i,j,s = 0,x;
+        cin >> n >> x;
+ 
+        for(i = 0;i < n;i++)
+        {
+            cin >> ara[i];
+        }
+        sort(ara,ara+n);
+        s = f(x);
+        if(s >= 1000000000000)
+        {
+            cout << "-1\n";
+        }
+        else
+        {
+            cout << s << N;
+        }
+    }
+    return 0;
+}
