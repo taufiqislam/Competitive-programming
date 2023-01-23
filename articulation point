@@ -1,0 +1,101 @@
+#pragma GCC Optimize ("Ofast")
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define ll long long
+#define N '\n'
+#define pb push_back
+#define pob pop_back
+#define ff first
+#define ss second
+#define bb begin()
+#define ee end()
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+using namespace std;
+using namespace __gnu_pbds;
+
+vector<ll> v[1000000];
+ll start[1000000];
+ll tin[1000000];
+ll g;
+vector<ll> vp;
+
+
+
+void dfs(ll n,ll x)
+{
+    if(start[n] == -1)
+    {
+        
+        start[n] = tin[n] = g;
+        g++;
+        //cout << n << " " << x << N;
+        ll children = 0,cnt = 0;
+        for(ll i = 0;i < v[n].size();i++)
+        {
+            if(v[n][i] == x)
+            {
+                continue;
+            }
+            if(start[v[n][i]] != -1)
+            {
+                tin[n] = min(tin[n],start[v[n][i]]);
+            }
+            else
+            {
+                dfs(v[n][i],n);
+                tin[n] = min(tin[n],tin[v[n][i]]);
+                //cout << n << " " << start[n] << " " << v[n][i] << " " << tin[v[n][i]] << N;
+                if((tin[v[n][i]] >= start[n]) && (x != -1))
+                {
+                    cnt++;
+                }
+                children++;
+            }
+        }
+        if(cnt > 0)
+        {
+            vp.pb(n);
+        }
+        if(x == -1 && children > 1)
+        {
+            vp.pb(n);
+        }
+    }
+}
+
+int main()
+{
+    fastIO();
+    ll it,t;
+    cin >> t;
+    for(it = 1;it <= t;it++)
+    {
+        g = 1;
+        ll i,n,m,j,k,c,d,f = 0,x,y;
+        vp.clear();
+        cin >> n >> m;
+        for(i = 0;i <= n;i++)
+        {
+            v[i].clear();
+            start[i] = -1;
+            tin[i] = -1;
+            
+        }
+       
+        for(i = 0;i < m;i++)
+        {
+            cin >> c >> d;
+            v[c].pb(d);
+            v[d].pb(c);
+        }
+        for(i = 1;i <= n;i++)
+        {
+            dfs(i,-1);
+        }
+        c = vp.size();
+        cout << "Case " << it << ": " << c << N;
+    }
+    return 0;
+}
