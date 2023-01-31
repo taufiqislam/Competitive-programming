@@ -3,9 +3,11 @@
 #define N '\n'
 #define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
 using namespace std;
- 
+
 ll seg[4 * 200005];
- 
+
+ll lazy[4*200005];
+
 void build(ll ara[],ll ind,ll low,ll high)
 {
     if(low == high)
@@ -19,7 +21,7 @@ void build(ll ara[],ll ind,ll low,ll high)
     seg[ind] = seg[2*ind] + seg[2*ind+1];
     return;
 }
- 
+
 ll query(ll ind,ll low,ll high,ll l,ll r)
 {
     if((low >= l) && (high <= r))
@@ -36,7 +38,7 @@ ll query(ll ind,ll low,ll high,ll l,ll r)
         return query(2*ind,low,mid,l,r)+ query(2*ind+1,mid+1,high,l,r);
     }
 }
- 
+
 ll update(ll ind,ll low,ll high,ll l,ll r,ll v)
 {
     if((low >= l) && (high <= r))
@@ -53,7 +55,65 @@ ll update(ll ind,ll low,ll high,ll l,ll r,ll v)
         return seg[ind] = update(2*ind,low,mid,l,r,v)+ update(2*ind+1,mid+1,high,l,r,v);
     }
 }
- 
+
+ll lazyquery(ll ind,ll low,ll high,ll l,ll r)
+{
+    if(lazy[ind] != 0)
+    {
+        seg[ind] = (high - low + 1) * lazy[ind];
+        if(low != high)
+        {
+            lazy[2*ind] += lazy[ind];
+            lazy[2*ind+1] += lazy[ind];
+        }
+        lazy[ind] = 0;
+    }
+    if((r < low) || (l > high))
+    {
+        return 0;
+    }
+    if((low >= l) && (high <= r))
+    {
+        return seg[ind];
+    }
+
+    ll mid = (low + high) / 2;
+    return lazyquery(2*ind,low,mid,l,r) + lazyquery(2*ind+1,mid+1,high,l,r);
+}
+
+void rangeupdate(ll ind,ll low,ll high,ll l,ll r,ll v)
+{
+    if(lazy[ind] != 0)
+    {
+        seg[ind] = (high - low + 1) * lazy[ind];
+        if(low != high)
+        {
+            lazy[2*ind] += lazy[ind];
+            lazy[2*ind+1] += lazy[ind];
+        }
+        lazy[ind] = 0;
+    }
+    if((r < low) || (l > high))
+    {
+        return;
+    }
+    if((low >= l) && (high <= r))
+    {
+        seg[ind] = (high - low + 1) * v;
+        if(low != high)
+        {
+            lazy[2*ind] += v;
+            lazy[2*ind+1] += v;
+        }
+        return;
+    }
+
+    ll mid = (low + high) / 2;
+    rangeupdate(2*ind,low,mid,l,r,v);
+    rangeupdate(2*ind+1,mid+1,high,l,r,v);
+    seg[ind] = seg[2*ind] + seg[2*ind+1];
+}
+
 int main()
 {
     ll n,i,j,s = 0,q,a,b,c;
@@ -78,3 +138,6 @@ int main()
     }
     return 0;
 }
+
+
+
