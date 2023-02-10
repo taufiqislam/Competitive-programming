@@ -1,0 +1,75 @@
+#pragma GCC Optimize ("Ofast")
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define ll long long
+#define N '\n'
+#define pb push_back
+#define pob pop_back
+#define ff first
+#define ss second
+#define bb begin()
+#define ee end()
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+using namespace std;
+using namespace __gnu_pbds;
+
+
+vector<char> segmentedSieve(ll L, ll R) 
+{
+    // generate all primes up to sqrt(R)
+    ll lim = sqrt(R);
+    vector<char> mark(lim + 1, false);
+    vector<ll> primes;
+    
+    for (ll i = 2; i <= lim; ++i) 
+    {
+        if (!mark[i]) 
+        {
+            primes.push_back(i);
+            for (ll j = i * i; j <= lim; j += i)
+            {
+                mark[j] = true;
+            }   
+        }
+    }
+    
+    vector<char> isPrime(R - L + 1, true);
+    for (ll i = 0;i < primes.size();i++)
+    {
+        ll c = primes[i];
+        for (ll j = max(c * c, (L + c - 1) / c * c); j <= R; j += c)
+        {
+            isPrime[j - L] = false;
+        }  
+    }
+    if (L == 1)
+    {
+        isPrime[0] = false;
+    }
+    return isPrime;
+}
+
+int main()
+{
+    fastIO();
+    ll t,it;
+    cin >> t;
+    for(it = 1;it <= t;it++)
+    {
+        ll n,q,i,j,k,s = 0,x,y,c = 0,d,a,b;
+        cin >> a >> b;
+        vector<char> isprime = segmentedSieve(a,b);
+        
+        for(i = 0;i < isprime.size();i++)
+        {
+            if(isprime[i] == true)
+            {
+                s++;
+            }
+        }
+        cout << "Case " << it << ": " << s << N;
+    }
+    return 0;
+}
