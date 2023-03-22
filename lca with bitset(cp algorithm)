@@ -1,0 +1,109 @@
+#pragma GCC Optimize ("Ofast")
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define ll long long
+#define N '\n'
+#define pb push_back
+#define pob pop_back
+#define ff first
+#define ss second
+#define bb begin()
+#define ee end()
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+using namespace std;
+using namespace __gnu_pbds;
+
+ll weight[500005];
+bitset<255> bs[500005];
+
+
+ll l;
+vector<ll> adj[500005];
+
+ll timer;
+vector<ll> tin, tout;
+vector<vector<ll> > up;
+
+void dfs(ll v, ll p)
+{
+    tin[v] = ++timer;
+    bs[v][weight[v]] = 1;
+    up[v][0] = p;
+    for (ll i = 1; i <= l; ++i)
+        up[v][i] = up[up[v][i-1]][i-1];
+
+    for (ll i = 0;i < (ll)adj[v].size();i++) {
+        if (adj[v][i] != p)
+        {
+            dfs(adj[v][i], v);
+            bs[v] |= bs[adj[v][i]];
+        }
+            
+    }
+
+    tout[v] = ++timer;
+}
+
+bool is_ancestor(ll u, ll v)
+{
+    return tin[u] <= tin[v] && tout[u] >= tout[v];
+}
+
+ll lca(ll u, ll v)
+{
+    if (is_ancestor(u, v))
+        return u;
+    if (is_ancestor(v, u))
+        return v;
+    for (ll i = l; i >= 0; --i) {
+        if (!is_ancestor(up[u][i], v))
+            u = up[u][i];
+    }
+    return up[u][0];
+}
+
+void preprocess(ll root,ll n) {
+    
+    tin.resize(n);
+    tout.resize(n);
+    timer = 0;
+    l = ceil(log2(n));
+    up.assign(n, vector<ll>(l + 1));
+    dfs(root, root);
+}
+
+int main()
+{
+    fastIO();
+    ll t,it;
+    cin >> t;
+    for(it = 1;it <= t;it++)
+    {
+        ll n,q,i,j,k,s = 0,x,y,c = 0,d,r;
+        cin >> n >> q >> r;
+        
+        for(i = 0;i < n;i++)
+        {
+            adj[i].clear();
+            cin >> weight[i];
+        }
+		for(i = 0;i < n-1;i++)
+		{
+			cin >> c >> d;
+            adj[c].pb(d);
+            adj[d].pb(c);
+		}
+        preprocess(r,n);
+		for(i = 0;i < q;i++)
+		{
+			cin >> c >> d;
+			x = lca(c,d);
+            //cout << x << N;
+             y = bs[x].count();
+             cout << y << N;
+		}
+    }
+    return 0;
+}
