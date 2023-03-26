@@ -1,0 +1,104 @@
+#pragma GCC Optimize ("Ofast")
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define ll long long
+#define N '\n'
+#define pb push_back
+#define pob pop_back
+#define ff first
+#define ss second
+#define bb begin()
+#define ee end()
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+using namespace std;
+using namespace __gnu_pbds;
+
+ll sparse[100005][40];
+
+void build(ll ara[],ll n)
+{
+    ll i,j,l;
+    for(i = 1;i <= n;i++)
+    {
+        sparse[i][0] = ara[i-1];
+    }
+    l = log2(n);
+    for(j = 1;j <= l;j++)
+    {
+        for(i = 1;i+(1LL<<(j-1)) <= n;i++)
+        {
+            sparse[i][j] = min(sparse[i][j-1],sparse[i+(1LL<<(j-1))][j-1]);
+        }
+    }
+}
+
+ll query(ll l,ll r)
+{
+    ll x, y;
+    y = r-l+1;
+    x = log2(y);
+    //cout << x << N;
+    //cout << l + (y-(1LL<<x)) << " " << sparse[l + (y-(1LL<<x))][x] << N;
+    return min(sparse[l][x],sparse[l + (y-(1LL<<x))][x]);
+}
+
+int main()
+{
+    fastIO();
+    ll t,it;
+    cin >> t;
+    for(it = 1;it <= t;it++)
+    {
+        ll n,q,i,j,k,s = 0,x,y,c = 0,d,l,r,mid,maxi = LLONG_MIN;
+        cin >> n;
+        ll ara[n];
+        for(i = 0;i < n;i++)
+        {
+            cin >> ara[i];
+        }
+        build(ara,n);
+        for(i = 1;i <= n;i++)
+        {
+            l = i,r = n;
+            x = 1,y = 1;
+            while(l <= r)
+            {
+                mid = (l+r)/2;
+                //cout << i << " " << mid << N;
+                d = query(i,mid);
+                //cout << i << " " << mid << " t " << d << N;
+                if(d < ara[i-1])
+                {
+                    r = mid-1;
+                }
+                else
+                {
+                    x = max(x,(mid-i+1));
+                    l = mid + 1;
+                }
+            }
+            l = 1,r = i;
+            while(l <= r)
+            {
+                mid = (l+r)/2;
+                d = query(mid,i);
+                if(d < ara[i-1])
+                {
+                    l = mid+1;
+                }
+                else
+                {
+                    y = max(y,(i-mid+1));
+                    r = mid-1;
+                }
+            }
+            //cout << i << " " << ara[i-1] << " " << x << " " << y << N;
+            //cout << (ara[i-1]*(x+y-1)) << N;
+            maxi = max(maxi,(ara[i-1]*(x+y-1)));
+        }
+        cout << "Case " << it << ": " << maxi << N;
+    }
+    return 0;
+}
