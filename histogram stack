@@ -1,0 +1,65 @@
+#pragma GCC Optimize ("Ofast")
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define ll long long
+#define N '\n'
+#define pb push_back
+#define pob pop_back
+#define ff first
+#define ss second
+#define bb begin()
+#define ee end()
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+using namespace std;
+using namespace __gnu_pbds;
+
+
+int main()
+{
+    fastIO();
+    ll t,it;
+    cin >> t;
+    for(it = 1;it <= t;it++)
+    {
+        ll n,q,i,j,k,s = 0,x,y,c = 0,d,l,r,mid,maxi = LLONG_MIN;
+        cin >> n;
+        ll ara[n+5];
+        for(i = 0;i < n;i++)
+        {
+            cin >> ara[i];
+        }
+        ara[n] = 0;
+        stack<pair<ll,ll> > st;
+        ll left[n+5];
+        ll right[n+5];
+        left[0] = 0;
+        st.push(make_pair(ara[0],0));
+        for(i = 1;i <= n;i++)
+        {
+            pair<ll,ll> p = st.top();
+            d = i;
+            while((p.ff > ara[i]))
+            {
+                d = left[p.ss];
+                right[p.ss] = i-1; 
+                st.pop();
+                if(st.empty())
+                {
+                    break;
+                }
+                p = st.top();
+            }
+            left[i] = d;
+            st.push(make_pair(ara[i],i));
+        }
+        for(i = 0;i < n;i++)
+        {
+            //cout << i << " " << left[i] << " " << right[i] << N;
+            maxi = max(maxi,(ara[i]*(right[i]-left[i]+1)));
+        }
+        cout << "Case " << it << ": " << maxi << N;
+    }
+    return 0;
+}
