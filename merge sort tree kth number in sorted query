@@ -1,0 +1,93 @@
+#pragma GCC Optimize ("Ofast")
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define ll long long
+#define N '\n'
+#define pb push_back
+#define pob pop_back
+#define ff first
+#define ss second
+#define bb begin()
+#define ee end()
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+using namespace std;
+using namespace __gnu_pbds;
+
+vector<ll> seg[4 * 100005];
+
+void build(pair<ll,ll> ara[],ll ind,ll low,ll high)
+{
+    if(low == high)
+    {
+        seg[ind].pb(ara[low-1].ss);
+        return;
+    }
+    ll mid = (low + high) / 2;
+    build(ara,2*ind,low,mid);
+    build(ara,2*ind+1,mid+1,high);
+    seg[ind].resize(seg[2*ind].size()+seg[2*ind+1].size());
+    merge(seg[2*ind].begin(),seg[2*ind].end(),seg[2*ind+1].begin(),seg[2*ind+1].end(),seg[ind].begin());
+    return;
+}
+
+ll query(ll ind,ll low,ll high,ll l,ll r,ll k)
+{
+    if(low == high)
+    {
+        return seg[ind][0];
+    }
+    ll c,d,mid,x;
+    mid = (low+high)/2;
+    c = upper_bound(seg[2*ind].begin(),seg[2*ind].end(),r) - seg[2*ind].begin();
+    d = lower_bound(seg[2*ind].begin(),seg[2*ind].end(),l) - seg[2*ind].begin();
+    //cout << c << " " << d << N;
+    x = c-d;
+    //cout << low << " " << mid << " " << x << N;
+    if(x >= k)
+    {
+        return query(2*ind,low,mid,l,r,k);
+    }
+    else
+    {
+        return query(2*ind+1,mid+1,high,l,r,k-x);
+    }
+}
+
+int main()
+{
+    fastIO();
+    ll t = 1,it;
+    for(it = 1;it <= t;it++)
+    {
+        ll n,q,i,j,k,s = 0,x,y,c = 0,d,e;
+        cin >> n >> q;
+        vector<ll> v;
+        for(i = 0;i < n;i++)
+        {
+            cin >> c;
+            v.pb(c);
+        }
+        pair<ll,ll> ara[n];
+        for(i = 0;i < n;i++)
+        {
+            ara[i].first = v[i];
+            ara[i].second = i+1;
+        }
+        sort(ara,ara+n);
+        // for(i = 0;i < n;i++)
+        // {
+        //     cout << ara[i].ff << " " << ara[i].ss << N;
+        // }
+        build(ara,1,1,n);
+        //cout << "t\n";
+        for(i = 0;i < q;i++)
+        {
+            cin >> c >> d >> e;
+            x = query(1,1,n,c,d,e);
+            cout << v[x-1] << N;
+        }
+    }
+    return 0;
+}
