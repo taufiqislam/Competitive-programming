@@ -1,0 +1,106 @@
+#pragma GCC Optimize ("Ofast")
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define ll long long
+#define N '\n'
+#define pb push_back
+#define pob pop_back
+#define ff first
+#define ss second
+#define bb begin()
+#define ee end()
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+using namespace std;
+using namespace __gnu_pbds;
+//order_of_key (k) : Number of items strictly smaller than k .
+//find_by_order(k) : K-th element in a set (counting from zero).
+
+class Graph {
+        ll V;
+        vector<vector<ll> > adj;
+        vector<vector<pair<ll,ll> > > cap;
+public:
+    Graph(ll V) 
+    {
+        this->V = V;
+        adj.resize(V);
+        cap.resize(V,vector<pair<ll,ll> >(V));
+    }
+    void addEdge(ll u, ll v, ll capacity) 
+    {
+        adj[u].push_back(v);
+        cap[u][v].first = 0;
+        cap[u][v].second += capacity;
+        adj[v].push_back(u);
+        cap[v][u].first = 0;
+        cap[v][u].second = 0;
+    }
+    bool bfs(ll s, ll t, vector<ll>& parent) 
+    {
+        vector<bool> visited(V, false);
+        queue<ll> q;
+        q.push(s);
+
+        visited[s] = true;
+        parent[s] = -1;
+        while (!q.empty()) 
+        {
+            ll u = q.front();
+            q.pop();
+            for (ll i = 0; i < (ll)adj[u].size(); i++) 
+            {
+                ll v = adj[u][i];
+                ll x = cap[u][v].second - cap[u][v].first;
+                if (!visited[v] && x > 0) 
+                {
+                    q.push(v);
+                    parent[v] = u;
+                    visited[v] = true;
+                }
+            }
+        }
+        return (visited[t] == true);
+    }
+    ll fordFulkerson(ll s, ll t) 
+    {
+        ll maxFlow = 0;
+        vector<ll> parent(V);
+        while (bfs(s, t, parent)) 
+        {
+            ll pathFlow = LLONG_MAX;
+            for (ll v = t; v != s; v = parent[v]) 
+            {
+                ll u = parent[v];
+                pathFlow = min(pathFlow, cap[u][v].second-cap[u][v].first);
+            }
+            for (ll v = t; v != s; v = parent[v]) 
+            {
+                ll u = parent[v];
+                cap[u][v].first += pathFlow;
+                cap[v][u].first -= pathFlow;
+            }
+            maxFlow += pathFlow;
+        }
+        return maxFlow;
+    }
+};
+int main() 
+{
+    ll V, E;
+    cin >> V >> E;
+    Graph g(V+5);
+    for (ll i = 0; i < E; i++) 
+    {
+        ll u, v, capacity;
+
+        cin >> u >> v >> capacity;
+        g.addEdge(u, v, capacity);
+    }
+    ll s, t;
+    s = 1;
+    t = V;
+    cout << g.fordFulkerson(s, t) << endl;
+    return 0;
+}
