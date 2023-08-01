@@ -1,0 +1,169 @@
+#pragma GCC Optimize ("Ofast")
+#include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#define ll int
+#define N '\n'
+#define pb push_back
+#define pob pop_back
+#define ff first
+#define ss second
+#define bb begin()
+#define ee end()
+#define fastIO() ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+#define ordered_set tree<int, null_type,less<int>, rb_tree_tag,tree_order_statistics_node_update>
+using namespace std;
+using namespace __gnu_pbds;
+
+vector<ll> v[200005];
+ll vis[200005];
+ll parent[200005][70];
+ll dis[200005];
+ll n,l;
+
+void bfs(ll n)
+{
+	queue<ll> q;
+	vis[n] = 1;
+	q.push(n);
+	parent[n][0] = n;
+	while(!q.empty())
+	{
+		ll c = q.front();
+		q.pop();
+		for (ll j = 1; j <= l; ++j)
+		{
+			parent[c][j] = parent[parent[c][j-1]][j-1];
+		}
+		for(ll i = 0;i < v[c].size();i++)
+		{
+			if(vis[v[c][i]] == 0)
+			{
+				//cout << v[c][i] << " " << c << N;
+				parent[v[c][i]][0] = c;
+				dis[v[c][i]] = dis[c] + 1;
+				vis[v[c][i]] = 1;
+
+				q.push(v[c][i]);
+			}
+		}
+	}
+}
+
+ll lca(ll u,ll v)
+{
+	ll a,b,c,i,j;
+	if(dis[u] > dis[v])
+	{
+		swap(u,v);
+	}
+	while(dis[u] != dis[v])
+	{
+		a = log2(dis[v]-dis[u]);
+		v = parent[v][a];
+	}
+	if(u == v)
+	{
+		return u;
+	}
+	b = log2(dis[v]);
+	c = (ll)(pow(2,b)+0.5);
+	for(ll i = b;i >= 0;i--)
+	{
+		if(parent[u][i] != parent[v][i])
+		{
+			u = parent[u][i];
+			v = parent[v][i];
+		}
+	}
+	return parent[u][0];
+}
+
+int main()
+{
+    fastIO();
+    ll t = 1,it;
+    for(it = 1;it <= t;it++)
+    {
+        ll q,i,j,k,s = 0,max1,max2,y,c = 0,d,h;
+        cin >> n;
+		for(i = 0;i < n-1;i++)
+		{
+			cin >> c >> d;
+            v[c].pb(d);
+            v[d].pb(c);
+		}
+        l = ceil(log2(n));
+		bfs(1);
+		cin >> q;
+
+		for(i = 0;i < q;i++)
+		{
+			cin >> c;
+            vector<pair<ll,ll> > vp;
+            for(j = 0;j < c;j++)
+            {
+                cin >> d;
+                vp.pb(make_pair(dis[d],d));
+            }
+
+			if(c <= 2)
+            {
+                cout << "YES\n";
+            }
+            else
+            {
+                sort(vp.begin(),vp.end());
+                max1 = vp[c-1].ss;
+                vector<pair<ll,ll> > gp;
+                for(j = 0;j < c-1;j++)
+                {
+                    y = lca(vp[j].ss,max1);
+                    //cout << y << " " << vp[j].ss << " " << max1 << N;
+                    if(y == vp[j].ss)
+                    {
+                        continue;
+                    }
+                    gp.pb(vp[j]);
+                }
+                if((ll)(gp.size()) == 0)
+                {
+                    cout << "YES\n";
+                }
+                else
+                {
+                    //cout << max2 << N;
+                    max2 = gp[gp.size()-1].ss;
+                    ll g = 0;
+                    for(j = 0;j < gp.size();j++)
+                    {
+                        y = lca(gp[j].ss,max2);
+                        //cout << y << " " << vp[j].ss << " " << max2 << N;
+                        if(y == gp[j].ss)
+                        {
+                            continue;
+                        }
+                        g++;
+                    }
+                    if(g == 0)
+                    {
+                        h = lca(max1,max2);
+                        if(dis[h] <= dis[vp[0].ss])
+                        {
+                            cout << "YES\n";
+                        }
+                        else
+                        {
+                            cout << "NO\n";
+                        }
+                    }
+                    else
+                    {
+                        cout << "NO\n";
+                    }
+                }
+            }
+		}
+    }
+    return 0;
+}
