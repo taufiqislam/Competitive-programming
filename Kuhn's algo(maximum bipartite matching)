@@ -64,8 +64,13 @@ int main()
         for(i = 1;i <= m;i++)
         {
             memset(vis,0,sizeof(vis));
-            if(kuhn(i))
+            kuhn(i);
+        }
+        for(i = m+1;i <= m+n;i++)
+        {
+            if(mt[i] != -1)
             {
+                //cout << mt[i] << " " << i << N;
                 ans++;
             }
         }
@@ -93,7 +98,3 @@ int main()
     }
     return 0;
 }
-
-
-
-
